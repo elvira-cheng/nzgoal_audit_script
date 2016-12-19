@@ -17,10 +17,8 @@ print '''
     
     This utility performs the NZGOAL LDS audit by
     comparing the LDS RSS feed with the NZGOAL
-    google form questionnaire as outputted in tsv
-    format from Google forms. For more information.
-    Please see the geodetic wiki 
-    
+    google form questionnaire as exported in tsv.
+    For more information. Please see the geodetic wiki 
     -------------------------------------------------
                                                   
      '''
@@ -86,13 +84,18 @@ with open(tsv_file, 'rb') as tsv:
             sys.exit()
     
     # COMAPRE LDS RSS DATA TO FORM DATA
+    print '\nAssessing RSS Data:'
+    
     for data_type in ('tables', 'layers'):
         status = 200
         page = 1
         feed = '{http://www.w3.org/2005/Atom}'
         while status == 200:
+            if page % 2 == 0:
+                print '|',
+                
             req = Request('http://data.linz.govt.nz/feeds/layers?page={}'.format(page))
-            try: 
+            try:
                 response = urlopen(req)
                 status = response.getcode()
                 data = response.read()
@@ -124,15 +127,15 @@ with open(tsv_file, 'rb') as tsv:
 
 # PRINT THE RESULTS
 print '''
-RESULTS:\nThe script has found all LDS ids of those public datasets 
+\n>>>RESULTS:\nThe script has found all LDS ids of those public datasets 
 published between the provided dates.The results are categorised based
-om the outcomes of the forms questionnaire, except those that did not find 
+on the outcomes of the forms questionnaire, except those that did not find 
 a matching id in the tsv/ spreadsheet. These are out-putted here under 
 the section "NO CORRESPONDING LDS ID IN FORMS SPREAD SHEET (.TSV)"
 '''
             
 for k, v in result.items():
-    print '{0}{1}{2}{1}'.format('-'*100,'\n', mappings_for_humans.get(k).upper())    
+    print '{0}{1}{2}{1}'.format('-'*100,'\n', mappings_for_humans.get(k).upper())
     print '{0}{1}{2}'.format('lds_id:', '\tDate Pub:', '\t'*2+'Data Set Name:')
     for id, data in v.items():
         print '{0}:\t{2}\t{1}'.format(id, data['name'], data['date_pub'] )
