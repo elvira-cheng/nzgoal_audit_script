@@ -38,13 +38,10 @@ mappings_for_humans = {'nid' : 'No Corresponding lds id In Forms Spread Sheet (.
                        
                              
 # GET USER INPUTS
-#date_from = '11/01/16'
 date_from = raw_input("Audit Date From (dd/mm/yy): ")
 date_from = datetime.strptime(date_from, "%d/%m/%y").date()
-#date_to = '11/07/16'
 date_to = raw_input("Audit Date To (dd/mm/yy):")
 date_to = datetime.strptime(date_to, "%d/%m/%y").date()
-#tsv_file = '~/NZ Goal Data Test - Form Responses 1.tsv'
 tsv_file = raw_input("csv file path: ") 
 
 # PROCESS FORMS SPREADSHEET
@@ -64,24 +61,28 @@ with open(tsv_file, 'rb') as tsv:
     # COMPILE FORM DATA (DICTIONARY)
     form_data = {}
     for row in reader:
-        id = row[0]
+        ids = row[0].replace(' ', '')
         
         # last question answered
         pos_last_q =  [i for i,x in enumerate(row) if x !=''][-1]
         str_last_q = header[pos_last_q]
         
+        
+        # iterate over ids in id coloum 
+        for id in ids.split(','):
+        
         # Categorise based on last answer
-        if re.match( r'.*RELEASE\.$', str_last_q):
-            form_data[id]='pub' #publish
-        elif re.match( r'(^Do not publish.*)', str_last_q):
-            form_data[id]='dnp' #do not publish
-        elif re.match( r'(.*release to restricted audience.*)', str_last_q):
-            form_data[id]='pwr'  #publish with restrictions
-        else:
-            print '''SCRIPT FAILED WHEN MATCHING TSV HEADER TEXT WITH CODE FOR 
-                    FOR CATEGORISATION. \n Has the forms outcomes wording changed?'''
+            if re.match( r'.*RELEASE\.$', str_last_q):
+                form_data[id]='pub' #publish
+            elif re.match( r'(^Do not publish.*)', str_last_q):
+                form_data[id]='dnp' #do not publish
+            elif re.match( r'(.*release to restricted audience.*)', str_last_q):
+                form_data[id]='pwr'  #publish with restrictions
+            else:
+                print '''SCRIPT FAILED WHEN MATCHING TSV HEADER TEXT WITH CODE FOR 
+                        FOR CATEGORISATION. \n Has the forms outcomes wording changed?'''
 
-            sys.exit()
+                sys.exit()
     
     # COMAPRE LDS RSS DATA TO FORM DATA
     print '\nAssessing RSS Data:'
