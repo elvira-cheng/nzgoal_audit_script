@@ -23,6 +23,12 @@ print '''
                                                   
      '''
 
+# CHECK PYTHON VERSION
+if sys.version_info < (2,3) or sys.version_info > (2,8):
+    print ''''Only Python 2.4 --> 2.7 is supported. 
+    You are running {0}'''.format(sys.version)  
+    sys.exit(-1)
+
 # RESULT CATEGORIES
 result = {'pub' : {}, #publish
        'pwr' : {}, #publish with restrictions
