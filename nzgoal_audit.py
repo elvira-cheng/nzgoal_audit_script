@@ -80,13 +80,15 @@ with open(tsv_file, 'rb') as tsv:
         # Categorise based on last answer
             if re.match( r'.*RELEASE\.$', str_last_q):
                 form_data[id]='pub' #publish
-            elif re.match( r'(^Do not publish.*)', str_last_q):
-                form_data[id]='dnp' #do not publish
             elif re.match( r'(.*release to restricted audience.*)', str_last_q):
                 form_data[id]='pwr'  #publish with restrictions
+            elif re.match( r'(.*obtain the relevant rights.*)', str_last_q):
+                form_data[id]='pwr'  #publish with restrictions
+            elif re.match( r'(^Do not publish.*)', str_last_q):
+                form_data[id]='dnp' #do not publish
             else:
                 print '''SCRIPT FAILED WHEN MATCHING TSV HEADER TEXT WITH CODE FOR 
-                        FOR CATEGORISATION. \n Has the forms outcomes wording changed?'''
+                    FOR CATEGORISATION. \n Has the forms outcomes wording changed?'''
 
                 sys.exit()
     
