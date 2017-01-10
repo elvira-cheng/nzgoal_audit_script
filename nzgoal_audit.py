@@ -4,6 +4,7 @@ from urllib2 import Request, urlopen, URLError
 import csv
 import sys
 import re
+from optparse import OptionParser
 
 # SPALSH
 print '''  
@@ -19,6 +20,12 @@ print '''
     comparing the LDS RSS feed with the NZGOAL
     google form questionnaire as exported in tsv.
     For more information. Please see the geodetic wiki 
+
+    e.g.
+        python nzgoal_audit.py --help
+        python nzgoal_audit.py -F '30/06/2015' 
+                               -T '1/07/2016' 
+                               -f './NZ Goal Data.tsv'
     -------------------------------------------------
                                                   
      '''
@@ -41,14 +48,32 @@ mappings_for_humans = {'nid' : 'No Corresponding lds id In Forms Spread Sheet (.
                        'pub' : 'Publish:',
                        'dnp' : 'Do Not Publish:'
                        }
-                       
-                             
+                                 
 # GET USER INPUTS
-date_from = raw_input("Audit Date From (dd/mm/yy): ")
+parser = OptionParser()
+
+parser.add_option("-F", "--from-date", action="store", dest="date_from", help="Audit from date (dd/mm/yy)")
+parser.add_option("-T", "--to-date", action="store", dest="date_to", help="Audit to date (dd/mm/yy)")
+parser.add_option("-f", "--tsv-file", action="store", dest="tsv_file", help="tsv file path")
+
+(options, args) = parser.parse_args()
+
+if options.date_from:
+    date_from = options.date_from
+else:
+    date_from = raw_input("Audit Date From (dd/mm/yy): ")
 date_from = datetime.strptime(date_from, "%d/%m/%y").date()
-date_to = raw_input("Audit Date To (dd/mm/yy):")
+
+if options.date_to:
+    date_to = options.date_to
+else:
+    date_to = raw_input("Audit Date To (dd/mm/yy): ")
 date_to = datetime.strptime(date_to, "%d/%m/%y").date()
-tsv_file = raw_input("csv file path: ") 
+
+if options.tsv_file:
+    tsv_file = options.tsv_file
+else:
+    tsv_file = raw_input("tsv file path: ") 
 
 # PROCESS FORMS SPREADSHEET
 
