@@ -92,22 +92,18 @@ with open(tsv_file, 'rb') as tsv:
     # COMPILE FORM DATA (DICTIONARY)
     form_data = {}
     for row in reader:
-        ids = row[0].replace(' ', '')
+        ids = re.sub(' +','',row[0])
         
         # last question answered
         pos_last_q =  [i for i,x in enumerate(row) if x !=''][-1]
         str_last_q = header[pos_last_q]
         
-        
         # iterate over ids in id coloum 
         for id in ids.split(','):
-        
         # Categorise based on last answer
             if re.match( r'.*RELEASE\.$', str_last_q):
                 form_data[id]='pub' #publish
-            elif re.match( r'(.*release to restricted audience.*)', str_last_q):
-                form_data[id]='pwr'  #publish with restrictions
-            elif re.match( r'(.*obtain the relevant rights.*)', str_last_q):
+            elif re.match( r'(.*release to restricted audience.*|.*obtain the relevant rights.*)', str_last_q):
                 form_data[id]='pwr'  #publish with restrictions
             elif re.match( r'(^Do not publish.*)', str_last_q):
                 form_data[id]='dnp' #do not publish
