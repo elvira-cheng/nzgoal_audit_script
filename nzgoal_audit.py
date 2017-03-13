@@ -23,8 +23,8 @@ print '''
 
     e.g.
         python nzgoal_audit.py --help
-        python nzgoal_audit.py -F '30/06/2015' 
-                               -T '1/07/2016' 
+        python nzgoal_audit.py -F '30/06/15' 
+                               -T '1/07/16' 
                                -f './NZ Goal Data.tsv'
     -------------------------------------------------
                                                   
