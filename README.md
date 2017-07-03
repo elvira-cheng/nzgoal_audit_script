@@ -71,7 +71,7 @@ The script takes three user inputs.
 
 ### Saving the results
 
-On the final run and report for every quarter, ave the files below to Objective (https://linzone/id:fA268176) in case we get externally audited about this.
+On the final run and report for every quarter, save the files below to Objective (https://linzone/id:fA268176) in case we get externally audited about this.
 
 Need to save:
 
