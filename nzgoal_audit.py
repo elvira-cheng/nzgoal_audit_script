@@ -124,7 +124,7 @@ with open(tsv_file, 'rb') as tsv:
             if page % 2 == 0:
                 print '|',
                 
-            req = Request('http://data.linz.govt.nz/feeds/layers?page={}'.format(page))
+            req = Request('http://data.linz.govt.nz/feeds/{0}?page={1}'.format(data_type, page))
             try:
                 response = urlopen(req)
                 status = response.getcode()
