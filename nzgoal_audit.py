@@ -168,5 +168,5 @@ for k, v in result.items():
     print '{0}{1}{2}{1}'.format('-'*100,'\n', mappings_for_humans.get(k).upper())
     print '{0}{1}{2}'.format('lds_id:', '\tDate Pub:', '\t'*2+'Data Set Name:')
     for id, data in v.items():
-        print '{0}:\t{2}\t{1}'.format(id, data['name'], data['date_pub'] )
+        print '{0}:\t{2}\t{1}'.format(id, data['name'].encode('utf8'), data['date_pub'] )
   
