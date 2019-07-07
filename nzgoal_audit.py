@@ -139,7 +139,7 @@ with open(tsv_file, 'rb') as tsv:
                     # Only consider data between user input dates
                     if data_set_date >= date_from and data_set_date <= date_to:
                         rss_id = e.find(feed+'id').text #<id>tag:data.linz.govt.nz,2016-09:layers:3452</id>
-                        re_match = re.match( r'(.*layers:)([0-9]{1,5}).*', rss_id, re.I)
+                        re_match = re.match( r'(.*layers:)([0-9]*)', rss_id, re.I)
                         rss_id = re_match.group(2)
                                                 
                         #find id in form_data
