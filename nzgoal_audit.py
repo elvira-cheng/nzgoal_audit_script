@@ -1,13 +1,15 @@
 import xml.etree.ElementTree as etree
 from datetime import datetime
-from urllib2 import Request, urlopen, URLError
+from urllib.request import Request, urlopen
+from urllib.error import URLError
 import csv
 import sys
 import re
 from optparse import OptionParser
+import io
 
 # SPALSH
-print '''  
+print ('''  
 
     -------------------------------------------------
      _     ____  ____       _   _   _ ____ ___ _____ 
@@ -28,13 +30,13 @@ print '''
                                -f './NZ Goal Data.tsv'
     -------------------------------------------------
                                                   
-     '''
+     ''')
 
 # CHECK PYTHON VERSION
-if sys.version_info < (2,3) or sys.version_info > (2,8):
-    print ''''Only Python 2.4 --> 2.7 is supported. 
-    You are running {0}'''.format(sys.version)  
-    sys.exit(-1)
+# if sys.version_info < (2,3) or sys.version_info > (2,8):
+#     print (''''Only Python 2.4 --> 2.7 is supported. 
+#     You are running {0}''').format(sys.version)  
+#     sys.exit(-1)
 
 # RESULT CATEGORIES
 result = {'pub' : {}, #publish
@@ -78,15 +80,15 @@ else:
 # PROCESS FORMS SPREADSHEET
 
 # Read in tsv
-with open(tsv_file, 'rb') as tsv:
+with open(tsv_file, 'r', newline='', encoding='utf-8') as tsv:
     reader = csv.reader(tsv, delimiter='\t')
-    header = reader.next()
+    header = next(reader)
     num_cols = len(header)
     
     # Check an id column was added to tsv as per instructions
 
     if header[0].upper() != 'ID':
-        print 'EXITING - The first column has not be titled "id" as per the instructions'
+        print ('EXITING - The first column has not be titled "id" as per the instructions')
         sys.exit()
         
     # COMPILE FORM DATA (DICTIONARY)
@@ -108,13 +110,13 @@ with open(tsv_file, 'rb') as tsv:
             elif re.match( r'(^Do not publish.*)', str_last_q):
                 form_data[id]='dnp' #do not publish
             else:
-                print '''SCRIPT FAILED WHEN MATCHING TSV HEADER TEXT WITH CODE FOR 
-                    FOR CATEGORISATION. \n Has the forms outcomes wording changed?'''
+                print ('''SCRIPT FAILED WHEN MATCHING TSV HEADER TEXT WITH CODE FOR 
+                    FOR CATEGORISATION. \n Has the forms outcomes wording changed?''')
 
                 sys.exit()
     
     # COMAPRE LDS RSS DATA TO FORM DATA
-    print '\nAssessing RSS Data:'
+    print ('\nAssessing RSS Data:')
     
     for data_type in ('tables', 'layers'):
         status = 200
@@ -122,7 +124,7 @@ with open(tsv_file, 'rb') as tsv:
         feed = '{http://www.w3.org/2005/Atom}'
         while status == 200:
             if page % 2 == 0:
-                print '|',
+                print ('|'),
                 
             req = Request('http://data.linz.govt.nz/feeds/{0}?page={1}'.format(data_type, page))
             try:
@@ -149,24 +151,34 @@ with open(tsv_file, 'rb') as tsv:
                         else :
                             result['nid'].update({rss_id: {'name' : e.find(feed+'title').text, 'date_pub':e.find(feed+'published').text}})       
    
-            except URLError, e:
-                status = e.getcode()
+            except URLError as e:
+                status = 404  # or 500, depending on the error
+                print(f"URL Error: {e.reason}")
+                # status = e.getcode()
             response.close()
             page += 1
 
 
 # PRINT THE RESULTS
-print '''
+print ('''
 \n>>>RESULTS:\nThe script has found all LDS ids of those public datasets 
 published between the provided dates.The results are categorised based
 on the outcomes of the forms questionnaire, except those that did not find 
 a matching id in the tsv/ spreadsheet. These are out-putted here under 
 the section "NO CORRESPONDING LDS ID IN FORMS SPREAD SHEET (.TSV)"
-'''
-            
+''' )
+
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+
 for k, v in result.items():
-    print '{0}{1}{2}{1}'.format('-'*100,'\n', mappings_for_humans.get(k).upper())
-    print '{0}{1}{2}'.format('lds_id:', '\tDate Pub:', '\t'*2+'Data Set Name:')
+    print ('{0}{1}{2}{1}'.format('-'*100, '\n', str(mappings_for_humans.get(k)).upper(), '\n'))
+    # print ('{0}{1}{2}').format('lds_id:', '\tDate Pub:', '\t'*2+'Data Set Name:')
+    # print ('{}{}\t{}\t{}'.format('lds_id:', 'Date Pub:', 'Data Set Name:', ''))
+    print ('{0}\t{1}\t{2}'.format('lds_id:', 'Date Pub:', 'Data Set Name:'))
     for id, data in v.items():
-        print '{0}:\t{2}\t{1}'.format(id, data['name'].encode('utf8'), data['date_pub'] )
+        if id is not None:
+            print(('{0}:\t{2}\t{1}').format(id, data['name'], data['date_pub'] ))
+        else:
+            print("Skipping None id")
+
   
